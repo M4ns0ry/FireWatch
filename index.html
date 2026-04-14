@@ -98,8 +98,15 @@ body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);disp
 let map,chart,fireMarker,routeLine;
 
 function showPage(id){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  // FIX CRASH MAPA
+  if(id === 'mapa' && map){
+    setTimeout(()=>{
+      map.invalidateSize();
+    },200);
+  }
 }
 
 function initMap(){
