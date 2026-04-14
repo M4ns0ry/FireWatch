@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FireWatch Pro</title>
+
+<!-- LIBRERÍAS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -19,26 +21,61 @@
 
 body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);display:flex}
 
-.sidebar{width:220px;background:#020617;height:100vh;padding:20px;border-right:1px solid #111827}
+.sidebar{
+  width:220px;
+  background:#020617;
+  height:100vh;
+  padding:20px;
+}
+
 .logo{font-size:20px;font-weight:bold;margin-bottom:20px;color:var(--accent)}
-.nav-btn{display:block;width:100%;padding:12px;margin-bottom:10px;border:none;border-radius:12px;background:transparent;color:var(--text);cursor:pointer}
-.nav-btn:hover{background:var(--accent);color:white}
+
+.nav-btn{
+  display:block;
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:10px;
+  background:transparent;
+  color:white;
+  cursor:pointer;
+}
+
+.nav-btn:hover{background:var(--accent)}
 
 .main{flex:1;padding:20px}
-.header{font-size:24px;margin-bottom:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
-.card{background:var(--card);padding:20px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.5)}
-.metric{margin:5px 0}
-
-.btn{padding:10px;border:none;border-radius:10px;background:var(--accent);color:white;cursor:pointer}
-.btn-danger{background:var(--danger)}
-
 .section{display:none}
 .active{display:block}
 
-#map{height:400px;border-radius:15px}
+.card{
+  background:var(--card);
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:var(--accent);
+  color:white;
+}
+
+.btn-danger{background:var(--danger)}
+
+#map{height:400px;border-radius:10px}
 </style>
 </head>
+
 <body>
 
 <div class="sidebar">
@@ -50,17 +87,16 @@ body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);disp
 </div>
 
 <div class="main">
-<div class="header">Sistema Inteligente de Incendios Forestales</div>
 
 <div id="dashboard" class="section active">
 <div class="grid">
 <div class="card">
 <h2>Sensores</h2>
-<p class="metric">Temp: <span id="temp">--</span></p>
-<p class="metric">Humo: <span id="smoke">--</span></p>
-<p class="metric">Humedad: <span id="humidity">--</span></p>
-<p class="metric">Viento: <span id="wind">--</span></p>
-<button class="btn" onclick="simulateData()">Simular</button>
+<p>Temp: <span id="temp">--</span></p>
+<p>Humo: <span id="smoke">--</span></p>
+<p>Humedad: <span id="humidity">--</span></p>
+<p>Viento: <span id="wind">--</span></p>
+<button onclick="simulateData()">Simular</button>
 </div>
 
 <div class="card">
@@ -80,14 +116,14 @@ body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);disp
 
 <div id="rutas" class="section">
 <div class="card">
-<h2>Ruta en tiempo real</h2>
+<h2>Ruta</h2>
 <button class="btn-danger" onclick="generateRoute()">Generar Ruta</button>
 </div>
 </div>
 
 <div id="estadisticas" class="section">
 <div class="card">
-<h2>Estadísticas avanzadas</h2>
+<h2>Estadísticas</h2>
 <canvas id="chart"></canvas>
 </div>
 </div>
@@ -95,76 +131,58 @@ body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);disp
 </div>
 
 <script>
-let map,chart,fireMarker,routeLine,initialized=false;
+let map, fireMarker=null, routeLine=null, chart=null;
+let initialized=false;
 
 function showPage(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 
-  // FIX CRASH MAPA
-  if(id === 'mapa' && map){
-    setTimeout(()=>{
-      map.invalidateSize();
-    },200);
+  if(id==='mapa' && map){
+    setTimeout(()=>map.invalidateSize(),200);
   }
 }
 
-let simLock=false;
-function simulateData(){
-  if(simLock) return; // evita spam (freeze)
-  simLock=true;
-  setTimeout(()=>simLock=false,300);
+function initMap(){
+  if(initialized) return;
+  initialized=true;
 
-  let t=r(60),s=r(500),h=r(100),w=r(50);
-  set('temp',t);set('smoke',s);set('humidity',h);set('wind',w);
+  map=L.map('map',{preferCanvas:true}).setView([20.6,-103.3],6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+}
+
+function simulateData(){
+  let t=random(60), s=random(500), h=random(100), w=random(50);
+
+  set('temp',t);
+  set('smoke',s);
+  set('humidity',h);
+  set('wind',w);
+
   let risk=Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1);
   set('risk',risk);
   set('evac',risk>70?'SI':'NO');
 
   if(risk>70){ createFire(); }
 
-  // DESACTIVAMOS gráfica si está pesada
-  try{ updateChart(t,s); }catch(e){}
-}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-}
-
-function simulateData(){
-let t=r(60),s=r(500),h=r(100),w=r(50);
-set('temp',t);set('smoke',s);set('humidity',h);set('wind',w);
-let risk=Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1);
-set('risk',risk);
-set('evac',risk>70?'SI':'NO');
-
-if(risk>70){
-createFire();
-}
-
-updateChart(t,s);
+  updateChart(t,s);
 }
 
 function createFire(){
   let lat=20+Math.random()*5;
   let lng=-103+Math.random()*5;
 
-  // eliminar incendio anterior
   if(fireMarker) map.removeLayer(fireMarker);
+  if(routeLine) map.removeLayer(routeLine);
 
   fireMarker=L.marker([lat,lng]).addTo(map)
-    .bindPopup("🔥 Incendio detectado")
+    .bindPopup('🔥 Incendio detectado')
     .openPopup();
-
-  // eliminar ruta anterior si existe
-  if(routeLine) {
-    map.removeLayer(routeLine);
-    routeLine = null;
-  }
 }
 
 function generateRoute(){
-  if(!fireMarker){
-    alert('⚠️ Primero debes simular un incendio');
-    return;
-  }
+  if(!fireMarker){ alert('Primero simula incendio'); return; }
 
   showPage('mapa');
 
@@ -172,52 +190,24 @@ function generateRoute(){
     let start=[20.6,-103.3];
     let end=fireMarker.getLatLng();
 
-    // limpiar ruta anterior
     if(routeLine) map.removeLayer(routeLine);
 
-    routeLine=L.polyline([start,[end.lat,end.lng]],{
-      color:'red',
-      weight:5
-    }).addTo(map);
+    routeLine=L.polyline([start,[end.lat,end.lng]],{color:'red'}).addTo(map);
 
     map.fitBounds(routeLine.getBounds());
   },200);
-}
-
-  // Cambiar automáticamente al mapa
-  showPage('mapa');
-
-  setTimeout(()=>{
-    let start=[20.6,-103.3]; // base de bomberos
-    let end=fireMarker.getLatLng();
-
-    if(routeLine) map.removeLayer(routeLine);
-
-    routeLine=L.polyline([start,[end.lat,end.lng]],{
-      color:'red',
-      weight:5
-    }).addTo(map);
-
-    // Marcador de inicio
-    L.marker(start).addTo(map).bindPopup('🚒 Estación de bomberos');
-
-    map.fitBounds(routeLine.getBounds());
-  },300);
-}).addTo(map);
-map.fitBounds(routeLine.getBounds());
 }
 
 function updateChart(t,s){
   if(!chart){
     chart=new Chart(document.getElementById('chart'),{
       type:'bar',
-      data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} ,
+      data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]},
       options:{animation:false}
     });
   }
 
-  // LIMITAR DATOS (EVITA FREEZE)
-  if(chart.data.labels.length > 10){
+  if(chart.data.labels.length>10){
     chart.data.labels.shift();
     chart.data.datasets[0].data.shift();
     chart.data.datasets[1].data.shift();
@@ -226,16 +216,12 @@ function updateChart(t,s){
   chart.data.labels.push(new Date().toLocaleTimeString());
   chart.data.datasets[0].data.push(t);
   chart.data.datasets[1].data.push(s);
+
   chart.update();
-},{label:'Humo',data:[]}]} });}
-chart.data.labels.push(new Date().toLocaleTimeString());
-chart.data.datasets[0].data.push(t);
-chart.data.datasets[1].data.push(s);
-chart.update();
 }
 
-function r(max){return Math.floor(Math.random()*max)}
-function set(id,v){document.getElementById(id).textContent=v}
+function random(max){return Math.floor(Math.random()*max)}
+function set(id,val){document.getElementById(id).textContent=val}
 
 window.onload=initMap;
 </script>
