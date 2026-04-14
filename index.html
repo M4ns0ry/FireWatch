@@ -96,19 +96,34 @@ chart.update();
 }
 
 function initMap(){
-map=new google.maps.Map(mapEl(),{center:{lat:20.6,lng:-103.3},zoom:5,mapTypeId:'satellite'});
+  map = L.map('map').setView([20.6, -103.3], 6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  generateSensors();
+},zoom:5,mapTypeId:'satellite'});
 generateSensors();
 }
 
 function generateSensors(){
 for(let i=0;i<10;i++){
-new google.maps.Circle({strokeColor:'#22c55e',fillColor:'#22c55e',fillOpacity:.3,map,center:{lat:20+Math.random()*5,lng:-103+Math.random()*5},radius:20000});
+L.circle([
+  20 + Math.random()*5,
+  -103 + Math.random()*5
+], {
+  color: '#22c55e',
+  fillColor: '#22c55e',
+  fillOpacity: 0.3,
+  radius: 20000
+}).addTo(map);
 }
 }
 
 function createFire(){
 let lat=20+Math.random()*5,lng=-103+Math.random()*5;
-new google.maps.Marker({position:{lat,lng},map});
+L.marker([lat, lng]).addTo(map);
 fires.push({lat,lng});
 updateList();
 spread(lat,lng);
@@ -123,7 +138,15 @@ function spread(lat,lng){
 let rds=10000;
 let i=setInterval(()=>{
 rds+=5000;
-new google.maps.Circle({strokeColor:'#ff0000',fillColor:'#ff0000',fillOpacity:.2,map,center:{lat,lng},radius:rds});
+L.circle([
+  20 + Math.random()*5,
+  -103 + Math.random()*5
+], {
+  color: '#22c55e',
+  fillColor: '#22c55e',
+  fillOpacity: 0.3,
+  radius: 20000
+}).addTo(map);
 if(rds>50000)clearInterval(i);
 },1000);
 }
@@ -150,6 +173,8 @@ function mapEl(){return document.getElementById('map')}
 setInterval(()=>set('time',time()),1000);
 </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCB3y4mBkVsf3N-ksXzcXq7X6uVIvVg2Gg&callback=initMap" async defer></script>
+<!-- Leaflet (mapa gratis sin API) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
 </html>
