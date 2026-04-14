@@ -130,13 +130,31 @@ fireMarker=L.marker([lat,lng]).addTo(map).bindPopup("🔥 Incendio detectado").o
 }
 
 function generateRoute(){
-if(!fireMarker) return alert('Primero genera un incendio');
+  if(!fireMarker){
+    alert('⚠️ Primero debes simular un incendio');
+    return;
+  }
 
-let start=[20.6,-103.3];
-let end=fireMarker.getLatLng();
+  // Cambiar automáticamente al mapa
+  showPage('mapa');
 
-if(routeLine) map.removeLayer(routeLine);
-routeLine=L.polyline([start,end],{color:'red'}).addTo(map);
+  setTimeout(()=>{
+    let start=[20.6,-103.3]; // base de bomberos
+    let end=fireMarker.getLatLng();
+
+    if(routeLine) map.removeLayer(routeLine);
+
+    routeLine=L.polyline([start,[end.lat,end.lng]],{
+      color:'red',
+      weight:5
+    }).addTo(map);
+
+    // Marcador de inicio
+    L.marker(start).addTo(map).bindPopup('🚒 Estación de bomberos');
+
+    map.fitBounds(routeLine.getBounds());
+  },300);
+}).addTo(map);
 map.fitBounds(routeLine.getBounds());
 }
 
@@ -158,3 +176,4 @@ window.onload=initMap;
 
 </body>
 </html>
+
