@@ -171,6 +171,9 @@ function time(){return new Date().toLocaleTimeString()}
 function chartCtx(){return document.getElementById('chart').getContext('2d')}
 function mapEl(){return document.getElementById('map')}
 setInterval(()=>set('time',time()),1000);
+
+// Inicializar mapa cuando carga la página
+window.onload = initMap;
 </script>
 
 <!-- Leaflet (mapa gratis sin API) -->
