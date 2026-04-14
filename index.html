@@ -1,183 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FireWatch - Detección de Incendios</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { margin:0; font-family:'Segoe UI',sans-serif; background:radial-gradient(circle at top,#0b0f1a,#020617); color:white; }
-    header { background:rgba(17,24,39,0.8); backdrop-filter:blur(10px); padding:20px; text-align:center; font-size:26px; font-weight:bold; color:#22c55e; }
-    .container{padding:20px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
-    .card{background:rgba(31,41,55,0.6);backdrop-filter:blur(15px);padding:20px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.6);transition:.3s}
-    .card:hover{transform:scale(1.02)}
-    .alert{background:#dc2626;padding:15px;border-radius:10px;margin-top:10px;display:none;animation:pulse 1s infinite}
-    @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
-    button{background:linear-gradient(45deg,#22c55e,#4ade80);border:none;padding:10px 20px;border-radius:10px;cursor:pointer;color:black;font-weight:bold;margin-top:10px}
-    #map{height:400px;border-radius:15px}
-    .status-bar{display:flex;justify-content:space-between;margin-bottom:15px;font-size:14px;opacity:.8}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FireWatch Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<style>
+body{margin:0;font-family:'Segoe UI';background:#020617;color:white}
+header{background:#111827;padding:15px;text-align:center;font-size:22px;color:#22c55e}
+nav{display:flex;justify-content:center;gap:10px;background:#020617;padding:10px}
+nav button{padding:10px 15px;border:none;border-radius:10px;background:#1f2937;color:white;cursor:pointer}
+nav button:hover{background:#22c55e;color:black}
+.section{display:none;padding:20px}
+.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:#1f2937;padding:20px;border-radius:15px}
+#map{height:400px}
+</style>
 </head>
 <body>
-<header>🔥 FireWatch - Sistema Inteligente de Detección de Incendios Forestales</header>
-<div class="container">
-<div class="status-bar"><div>🌐 Sistema activo</div><div id="time"></div></div>
+<header>🔥 FireWatch Sistema Profesional</header>
+
+<nav>
+<button onclick="showPage('dashboard')">Dashboard</button>
+<button onclick="showPage('mapa')">Mapa</button>
+<button onclick="showPage('rutas')">Rutas</button>
+<button onclick="showPage('estadisticas')">Estadísticas</button>
+<button onclick="showPage('encuestas')">Encuestas</button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
 <div class="grid">
-
 <div class="card">
-<h2>🌡️ Sensores en Tiempo Real</h2>
-<p>Temperatura: <span id="temp">--</span> °C</p>
-<p>Humo: <span id="smoke">--</span> ppm</p>
-<p>Humedad: <span id="humidity">--</span>%</p>
-<p>Viento: <span id="wind">--</span> km/h</p>
-<button onclick="simulateData()">Simular Datos</button>
-<div class="alert" id="alertBox">🚨 Incendio detectado</div>
-<p>Probabilidad: <span id="risk">--</span>%</p>
-</div>
-
-<div class="card"><h2>📊 Análisis</h2><canvas id="chart"></canvas></div>
-<div class="card"><h2>🛰️ Mapa</h2><div id="map"></div></div>
-
-<div class="card">
-<h2>🚒 Incendios Activos</h2>
-<div id="fireList"></div>
+<h2>Sensores</h2>
+<p>Temp: <span id="temp">--</span></p>
+<p>Humo: <span id="smoke">--</span></p>
+<p>Humedad: <span id="humidity">--</span></p>
+<p>Viento: <span id="wind">--</span></p>
+<button onclick="simulateData()">Simular</button>
 </div>
 
 <div class="card">
-<h2>🧠 IA Predictiva</h2>
-<p>Riesgo 24h: <span id="futureRisk">--</span>%</p>
-<p>Evacuación recomendada: <span id="evac">--</span></p>
+<h2>IA</h2>
+<p>Riesgo: <span id="risk">--</span>%</p>
+<p>Evacuación: <span id="evac">--</span></p>
+</div>
+</div>
 </div>
 
-<div class="card">
-<h2>📡 Sistema</h2>
-<p>Sensores: 10</p>
-<p>Satélites: 3</p>
-<p>Última actualización: <span id="lastUpdate">--</span></p>
+<!-- MAPA -->
+<div id="mapa" class="section">
+<h2>Mapa de Incendios</h2>
+<div id="map"></div>
 </div>
 
-<div class="card">
-<h2>🚒 Ruta de emergencia</h2>
+<!-- RUTAS -->
+<div id="rutas" class="section">
+<h2>Rutas de emergencia</h2>
 <p id="route">--</p>
-<button onclick="generateRoute()">Generar ruta</button>
+<button onclick="generateRoute()">Generar Ruta</button>
 </div>
 
+<!-- ESTADISTICAS -->
+<div id="estadisticas" class="section">
+<h2>Estadísticas</h2>
+<canvas id="chart"></canvas>
 </div>
+
+<!-- ENCUESTAS -->
+<div id="encuestas" class="section">
+<h2>Encuesta</h2>
+<p>¿Consideras importante este sistema?</p>
+<button onclick="alert('Gracias por tu respuesta')">Sí</button>
+<button onclick="alert('Gracias por tu respuesta')">No</button>
 </div>
 
 <script>
-let chart,map,fires=[];
+let map,chart;
+
+function showPage(id){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+function initMap(){
+map=L.map('map').setView([20.6,-103.3],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+}
 
 function simulateData(){
 let t=r(60),s=r(500),h=r(100),w=r(50);
 set('temp',t);set('smoke',s);set('humidity',h);set('wind',w);
-let risk=Math.min(100,Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1));
+let risk=Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1);
 set('risk',risk);
-set('futureRisk',Math.min(100,risk+r(20)));
-set('lastUpdate',time());
-set('evac',risk>80?'SI':'NO');
-
-if(risk>70){
-show('alertBox');
-createFire();
-beep();
-}else hide('alertBox');
-
+set('evac',risk>70?'SI':'NO');
 updateChart(t,s);
 }
 
 function updateChart(t,s){
-if(!chart){chart=new Chart(chartCtx(),{type:'line',data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} });}
-chart.data.labels.push(time());
+if(!chart){chart=new Chart(document.getElementById('chart'),{type:'line',data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} });}
+chart.data.labels.push(new Date().toLocaleTimeString());
 chart.data.datasets[0].data.push(t);
 chart.data.datasets[1].data.push(s);
 chart.update();
 }
 
-function initMap(){
-  map = L.map('map').setView([20.6, -103.3], 6);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
-  }).addTo(map);
-
-  generateSensors();
-},zoom:5,mapTypeId:'satellite'});
-generateSensors();
-}
-
-function generateSensors(){
-for(let i=0;i<10;i++){
-L.circle([
-  20 + Math.random()*5,
-  -103 + Math.random()*5
-], {
-  color: '#22c55e',
-  fillColor: '#22c55e',
-  fillOpacity: 0.3,
-  radius: 20000
-}).addTo(map);
-}
-}
-
-function createFire(){
-let lat=20+Math.random()*5,lng=-103+Math.random()*5;
-L.marker([lat, lng]).addTo(map);
-fires.push({lat,lng});
-updateList();
-spread(lat,lng);
-}
-
-function updateList(){
-let el=document.getElementById('fireList');el.innerHTML='';
-fires.forEach(f=>el.innerHTML+=`🔥 ${f.lat.toFixed(2)}, ${f.lng.toFixed(2)}<br>`);
-}
-
-function spread(lat,lng){
-let rds=10000;
-let i=setInterval(()=>{
-rds+=5000;
-L.circle([
-  20 + Math.random()*5,
-  -103 + Math.random()*5
-], {
-  color: '#22c55e',
-  fillColor: '#22c55e',
-  fillOpacity: 0.3,
-  radius: 20000
-}).addTo(map);
-if(rds>50000)clearInterval(i);
-},1000);
-}
-
 function generateRoute(){
-document.getElementById('route').textContent='Ruta óptima generada: estación → incendio';
-}
-
-function beep(){
-let ctx=new AudioContext();
-let osc=ctx.createOscillator();
-osc.connect(ctx.destination);
-osc.start();
-setTimeout(()=>osc.stop(),200);
+document.getElementById('route').textContent='Ruta generada correctamente';
 }
 
 function r(max){return Math.floor(Math.random()*max)}
 function set(id,v){document.getElementById(id).textContent=v}
-function show(id){document.getElementById(id).style.display='block'}
-function hide(id){document.getElementById(id).style.display='none'}
-function time(){return new Date().toLocaleTimeString()}
-function chartCtx(){return document.getElementById('chart').getContext('2d')}
-function mapEl(){return document.getElementById('map')}
-setInterval(()=>set('time',time()),1000);
 
-// Inicializar mapa cuando carga la página
-window.onload = initMap;
+window.onload=initMap;
 </script>
-
-<!-- Leaflet (mapa gratis sin API) -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </body>
 </html>
