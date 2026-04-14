@@ -95,7 +95,7 @@ body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);disp
 </div>
 
 <script>
-let map,chart,fireMarker,routeLine;
+let map,chart,fireMarker,routeLine,initialized=false;
 
 function showPage(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -109,9 +109,23 @@ function showPage(id){
   }
 }
 
-function initMap(){
-map=L.map('map').setView([20.6,-103.3],6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+let simLock=false;
+function simulateData(){
+  if(simLock) return; // evita spam (freeze)
+  simLock=true;
+  setTimeout(()=>simLock=false,300);
+
+  let t=r(60),s=r(500),h=r(100),w=r(50);
+  set('temp',t);set('smoke',s);set('humidity',h);set('wind',w);
+  let risk=Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1);
+  set('risk',risk);
+  set('evac',risk>70?'SI':'NO');
+
+  if(risk>70){ createFire(); }
+
+  // DESACTIVAMOS gráfica si está pesada
+  try{ updateChart(t,s); }catch(e){}
+}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 }
 
 function simulateData(){
