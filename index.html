@@ -194,9 +194,26 @@ map.fitBounds(routeLine.getBounds());
 }
 
 function updateChart(t,s){
-if(!chart){chart=new Chart(document.getElementById('chart'),{
-type:'bar',
-data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} });}
+  if(!chart){
+    chart=new Chart(document.getElementById('chart'),{
+      type:'bar',
+      data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} ,
+      options:{animation:false}
+    });
+  }
+
+  // LIMITAR DATOS (EVITA FREEZE)
+  if(chart.data.labels.length > 10){
+    chart.data.labels.shift();
+    chart.data.datasets[0].data.shift();
+    chart.data.datasets[1].data.shift();
+  }
+
+  chart.data.labels.push(new Date().toLocaleTimeString());
+  chart.data.datasets[0].data.push(t);
+  chart.data.datasets[1].data.push(s);
+  chart.update();
+},{label:'Humo',data:[]}]} });}
 chart.data.labels.push(new Date().toLocaleTimeString());
 chart.data.datasets[0].data.push(t);
 chart.data.datasets[1].data.push(s);
