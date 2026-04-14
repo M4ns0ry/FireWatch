@@ -122,11 +122,21 @@ updateChart(t,s);
 }
 
 function createFire(){
-let lat=20+Math.random()*5;
-let lng=-103+Math.random()*5;
+  let lat=20+Math.random()*5;
+  let lng=-103+Math.random()*5;
 
-if(fireMarker) map.removeLayer(fireMarker);
-fireMarker=L.marker([lat,lng]).addTo(map).bindPopup("🔥 Incendio detectado").openPopup();
+  // eliminar incendio anterior
+  if(fireMarker) map.removeLayer(fireMarker);
+
+  fireMarker=L.marker([lat,lng]).addTo(map)
+    .bindPopup("🔥 Incendio detectado")
+    .openPopup();
+
+  // eliminar ruta anterior si existe
+  if(routeLine) {
+    map.removeLayer(routeLine);
+    routeLine = null;
+  }
 }
 
 function generateRoute(){
@@ -134,6 +144,24 @@ function generateRoute(){
     alert('⚠️ Primero debes simular un incendio');
     return;
   }
+
+  showPage('mapa');
+
+  setTimeout(()=>{
+    let start=[20.6,-103.3];
+    let end=fireMarker.getLatLng();
+
+    // limpiar ruta anterior
+    if(routeLine) map.removeLayer(routeLine);
+
+    routeLine=L.polyline([start,[end.lat,end.lng]],{
+      color:'red',
+      weight:5
+    }).addTo(map);
+
+    map.fitBounds(routeLine.getBounds());
+  },200);
+}
 
   // Cambiar automáticamente al mapa
   showPage('mapa');
@@ -176,4 +204,3 @@ window.onload=initMap;
 
 </body>
 </html>
-
