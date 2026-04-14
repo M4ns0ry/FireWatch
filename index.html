@@ -10,213 +10,144 @@
 
 <style>
 :root{
-  --bg:#020617;
-  --card:#0f172a;
-  --accent:#22c55e;
-  --accent2:#ef4444;
-  --text:#e5e7eb;
+  --bg:#0a0f1c;
+  --card:#121a2b;
+  --accent:#3b82f6;
+  --danger:#ef4444;
+  --text:#e2e8f0;
 }
 
 body{margin:0;font-family:'Segoe UI';background:var(--bg);color:var(--text);display:flex}
 
-/* SIDEBAR */
-.sidebar{
-  width:220px;
-  background:#020617;
-  height:100vh;
-  padding:20px;
-  border-right:1px solid #111827;
-}
+.sidebar{width:220px;background:#020617;height:100vh;padding:20px;border-right:1px solid #111827}
+.logo{font-size:20px;font-weight:bold;margin-bottom:20px;color:var(--accent)}
+.nav-btn{display:block;width:100%;padding:12px;margin-bottom:10px;border:none;border-radius:12px;background:transparent;color:var(--text);cursor:pointer}
+.nav-btn:hover{background:var(--accent);color:white}
 
-.logo{
-  font-size:20px;
-  font-weight:bold;
-  margin-bottom:20px;
-  color:var(--accent);
-}
-
-.nav-btn{
-  display:block;
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border:none;
-  border-radius:12px;
-  background:transparent;
-  color:var(--text);
-  text-align:left;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.nav-btn:hover{
-  background:var(--accent);
-  color:black;
-}
-
-/* MAIN */
 .main{flex:1;padding:20px}
+.header{font-size:24px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:var(--card);padding:20px;border-radius:20px;box-shadow:0 10px 25px rgba(0,0,0,0.5)}
+.metric{margin:5px 0}
 
-.header{
-  font-size:24px;
-  margin-bottom:20px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-  gap:20px;
-}
-
-.card{
-  background:var(--card);
-  padding:20px;
-  border-radius:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.5);
-}
-
-.card h2{margin-top:0}
-
-.metric{
-  font-size:18px;
-  margin:5px 0;
-}
-
-.btn{
-  padding:10px 15px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(45deg,var(--accent),#4ade80);
-  color:black;
-  font-weight:bold;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.btn-danger{
-  background:linear-gradient(45deg,var(--accent2),#f87171);
-  color:white;
-}
+.btn{padding:10px;border:none;border-radius:10px;background:var(--accent);color:white;cursor:pointer}
+.btn-danger{background:var(--danger)}
 
 .section{display:none}
 .active{display:block}
 
 #map{height:400px;border-radius:15px}
-
-.badge{
-  padding:5px 10px;
-  border-radius:10px;
-  background:#111827;
-  font-size:12px;
-}
-
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <div class="logo">🔥 FireWatch</div>
-  <button class="nav-btn" onclick="showPage('dashboard')">Dashboard</button>
-  <button class="nav-btn" onclick="showPage('mapa')">Mapa</button>
-  <button class="nav-btn" onclick="showPage('rutas')">Rutas</button>
-  <button class="nav-btn" onclick="showPage('estadisticas')">Estadísticas</button>
-  <button class="nav-btn" onclick="showPage('encuestas')">Encuestas</button>
+<div class="logo">🔥 FireWatch</div>
+<button class="nav-btn" onclick="showPage('dashboard')">Dashboard</button>
+<button class="nav-btn" onclick="showPage('mapa')">Mapa</button>
+<button class="nav-btn" onclick="showPage('rutas')">Rutas</button>
+<button class="nav-btn" onclick="showPage('estadisticas')">Estadísticas</button>
 </div>
 
 <div class="main">
 <div class="header">Sistema Inteligente de Incendios Forestales</div>
 
-<!-- DASHBOARD -->
 <div id="dashboard" class="section active">
 <div class="grid">
-
 <div class="card">
 <h2>Sensores</h2>
-<div class="metric">🌡️ Temp: <span id="temp">--</span></div>
-<div class="metric">💨 Humo: <span id="smoke">--</span></div>
-<div class="metric">💧 Humedad: <span id="humidity">--</span></div>
-<div class="metric">🌬️ Viento: <span id="wind">--</span></div>
-<button class="btn" onclick="simulateData()">Simular Datos</button>
+<p class="metric">Temp: <span id="temp">--</span></p>
+<p class="metric">Humo: <span id="smoke">--</span></p>
+<p class="metric">Humedad: <span id="humidity">--</span></p>
+<p class="metric">Viento: <span id="wind">--</span></p>
+<button class="btn" onclick="simulateData()">Simular</button>
 </div>
 
 <div class="card">
 <h2>IA</h2>
-<p>Riesgo: <span class="badge" id="risk">--</span>%</p>
-<p>Evacuación: <span class="badge" id="evac">--</span></p>
+<p>Riesgo: <span id="risk">--</span>%</p>
+<p>Evacuación: <span id="evac">--</span></p>
+</div>
+</div>
 </div>
 
-</div>
-</div>
-
-<!-- MAPA -->
 <div id="mapa" class="section">
 <div class="card">
-<h2>Mapa en Tiempo Real</h2>
+<h2>Mapa</h2>
 <div id="map"></div>
 </div>
 </div>
 
-<!-- RUTAS -->
 <div id="rutas" class="section">
 <div class="card">
-<h2>Rutas de Emergencia</h2>
-<p id="route">--</p>
+<h2>Ruta en tiempo real</h2>
 <button class="btn-danger" onclick="generateRoute()">Generar Ruta</button>
 </div>
 </div>
 
-<!-- ESTADISTICAS -->
 <div id="estadisticas" class="section">
 <div class="card">
-<h2>Estadísticas</h2>
+<h2>Estadísticas avanzadas</h2>
 <canvas id="chart"></canvas>
-</div>
-</div>
-
-<!-- ENCUESTAS -->
-<div id="encuestas" class="section">
-<div class="card">
-<h2>Encuesta</h2>
-<p>¿El sistema ayuda a prevenir incendios?</p>
-<button class="btn" onclick="alert('Respuesta registrada')">Sí</button>
-<button class="btn-danger" onclick="alert('Respuesta registrada')">No</button>
 </div>
 </div>
 
 </div>
 
 <script>
-let map,chart;
+let map,chart,fireMarker,routeLine;
 
 function showPage(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
 }
 
 function initMap(){
-  map=L.map('map').setView([20.6,-103.3],6);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+map=L.map('map').setView([20.6,-103.3],6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 }
 
 function simulateData(){
-  let t=r(60),s=r(500),h=r(100),w=r(50);
-  set('temp',t);set('smoke',s);set('humidity',h);set('wind',w);
-  let risk=Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1);
-  set('risk',risk);
-  set('evac',risk>70?'SI':'NO');
-  updateChart(t,s);
+let t=r(60),s=r(500),h=r(100),w=r(50);
+set('temp',t);set('smoke',s);set('humidity',h);set('wind',w);
+let risk=Math.floor(t*0.4+s*0.3+(100-h)*0.2+w*0.1);
+set('risk',risk);
+set('evac',risk>70?'SI':'NO');
+
+if(risk>70){
+createFire();
 }
 
-function updateChart(t,s){
-  if(!chart){chart=new Chart(document.getElementById('chart'),{type:'line',data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} });}
-  chart.data.labels.push(new Date().toLocaleTimeString());
-  chart.data.datasets[0].data.push(t);
-  chart.data.datasets[1].data.push(s);
-  chart.update();
+updateChart(t,s);
+}
+
+function createFire(){
+let lat=20+Math.random()*5;
+let lng=-103+Math.random()*5;
+
+if(fireMarker) map.removeLayer(fireMarker);
+fireMarker=L.marker([lat,lng]).addTo(map).bindPopup("🔥 Incendio detectado").openPopup();
 }
 
 function generateRoute(){
-  document.getElementById('route').textContent='Ruta óptima generada correctamente';
+if(!fireMarker) return alert('Primero genera un incendio');
+
+let start=[20.6,-103.3];
+let end=fireMarker.getLatLng();
+
+if(routeLine) map.removeLayer(routeLine);
+routeLine=L.polyline([start,end],{color:'red'}).addTo(map);
+map.fitBounds(routeLine.getBounds());
+}
+
+function updateChart(t,s){
+if(!chart){chart=new Chart(document.getElementById('chart'),{
+type:'bar',
+data:{labels:[],datasets:[{label:'Temp',data:[]},{label:'Humo',data:[]}]} });}
+chart.data.labels.push(new Date().toLocaleTimeString());
+chart.data.datasets[0].data.push(t);
+chart.data.datasets[1].data.push(s);
+chart.update();
 }
 
 function r(max){return Math.floor(Math.random()*max)}
